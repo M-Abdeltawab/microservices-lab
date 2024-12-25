@@ -18,21 +18,21 @@ jobs:
 
     - name: Log in to Amazon ECR
       run: |
-    aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 557690605111.dkr.ecr.us-west-2.amazonaws.com
+        aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 557690605111.dkr.ecr.us-west-2.amazonaws.com
 
     - name: Build and Push Docker Images
       run: |
         # Build and push images for all microservices
         for service in user-service order-service payment-service; do
-          docker build -t ${{ secrets.ECR_REPOSITORY }}/$service:latest ./$service
-          docker push ${{ secrets.ECR_REPOSITORY }}/$service:latest
+          docker build -t 557690605111.dkr.ecr.us-west-2.amazonaws.com/$service:latest ./$service
+          docker push 557690605111.dkr.ecr.us-west-2.amazonaws.com/$service:latest
         done
 
     - name: Update Kubernetes Deployments
       run: |
         # Update Kubernetes deployments with the new image
         for service in user-service order-service payment-service; do
-          kubectl set image deployment/$service $service=${{ secrets.ECR_REPOSITORY }}/$service:latest --namespace=default
+          kubectl set image deployment/$service $service=557690605111.dkr.ecr.us-west-2.amazonaws.com/$service:latest --namespace=default
         done
       env:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
