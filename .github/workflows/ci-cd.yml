@@ -35,11 +35,13 @@ jobs:
           docker push 557690605111.dkr.ecr.us-west-2.amazonaws.com/$service:latest
         done
 
+    - name: Update Kubeconfig for EKS Cluster
+      run: |
+        aws eks --region us-west-2 update-kubeconfig --name microservices-cluster
+
     - name: Update Kubernetes Deployments
       run: |
         # Update Kubernetes deployments with the new image
         for service in user-service order-service payment-service; do
           kubectl set image deployment/$service $service=557690605111.dkr.ecr.us-west-2.amazonaws.com/$service:latest --namespace=default
         done
-      env:
-        KUBECONFIG: ${{ secrets.KUBECONFIG }}
